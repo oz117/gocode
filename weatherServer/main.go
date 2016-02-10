@@ -15,8 +15,8 @@ var addr = flag.String("localhost", ":4000", "http service address") // http ser
  */
 func getWeather(w http.ResponseWriter, r *http.Request) {
 	mw := multiWeatherProvider{
-		openWeatherMap{apikey: "88ed45090cdc91cf5202c4217e8fabd9"},
-		weatherUnderground{apikey: "fe15c5aa02cd1a16"},
+		openWeatherMap{apikey: "your api key"},
+		weatherUnderground{apikey: "your api key"},
 	}
 	city := strings.SplitN(r.URL.Path, "/", 3)[2]
 
