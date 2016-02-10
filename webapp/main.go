@@ -30,8 +30,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[len("/view/"):]
 
 	p, _ := loadPage(title)
-	t, _ := template.ParseFiles("Views/view.html")
-	t.Execute(w, p)
+	renderTemplate(w, "Views/view.html", p)
 }
 
 func editHandler(w http.ResponseWriter, r *http.Request) {
@@ -41,8 +40,7 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p = &Page{Title: title}
 	}
-	t, _ := template.ParseFiles("Views/edit.html")
-	t.Execute(w, p)
+	renderTemplate(w, "Views/edit.html", p)
 }
 
 func saveHandler(w http.ResponseWriter, r *http.Request) {
@@ -52,6 +50,11 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 	p := &Page{Title: title, Body: []byte(body)}
 	p.savePage()
 	http.Redirect(w, r, "/view/"+title, http.StatusFound)
+}
+
+func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
+	t, _ := template.ParseFiles(tmpl)
+	t.Execute(w, p)
 }
 
 func main() {
