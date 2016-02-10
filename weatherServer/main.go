@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -10,15 +9,14 @@ import (
 )
 
 var addr = flag.String("localhost", ":4000", "http service address") // http server address
-var templ = template.Must(template.New("weather").Parse(TemplateStr))
 
 /*
  * Retrieves the weatherData structure and shows the html page
  */
 func getWeather(w http.ResponseWriter, r *http.Request) {
 	mw := multiWeatherProvider{
-		openWeatherMap{apikey: "your api key"},
-		weatherUnderground{apikey: "your api key"},
+		openWeatherMap{apikey: "88ed45090cdc91cf5202c4217e8fabd9"},
+		weatherUnderground{apikey: "fe15c5aa02cd1a16"},
 	}
 	city := strings.SplitN(r.URL.Path, "/", 3)[2]
 
@@ -27,8 +25,6 @@ func getWeather(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	templ.Execute(w, r.FormValue("s"))
-
 	temp := strconv.FormatFloat(data, 'E', 2, 64)
 	w.Write([]byte("<div>" + temp + "</div>"))
 }
@@ -37,7 +33,6 @@ func getWeather(w http.ResponseWriter, r *http.Request) {
  * Writes a simple welcome message
  */
 func welcome(w http.ResponseWriter, r *http.Request) {
-	templ.Execute(w, r.FormValue("s"))
 	w.Write([]byte("<div>Welcome to my weather provider</div>"))
 }
 
@@ -47,4 +42,5 @@ func main() {
 	if err := http.ListenAndServe(":8000", nil); err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
+	log.Printf("Server started on port 8000")
 }
