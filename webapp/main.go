@@ -11,6 +11,8 @@ type Page struct {
 	Body  []byte
 } // Content of a page
 
+var templates = template.Must(template.ParseFiles("Views/view.html", "Views/edit.html"))
+
 func (p *Page) savePage() error {
 	fileName := p.Title + ".txt"
 	return ioutil.WriteFile(fileName, p.Body, 0600)
@@ -34,7 +36,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/edit/"+title, http.StatusFound)
 		return
 	}
-	renderTemplate(w, "Views/view.html", p)
+	renderTemplate(w, "view.html", p)
 }
 
 func editHandler(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +46,7 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p = &Page{Title: title}
 	}
-	renderTemplate(w, "Views/edit.html", p)
+	renderTemplate(w, "edit.html", p)
 }
 
 func saveHandler(w http.ResponseWriter, r *http.Request) {
@@ -60,12 +62,7 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
-	t, err := template.ParseFiles(tmpl)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if err := t.Execute(w, p); err != nil {
+	if err := templates.ExecuteTemplate(w, tmpl, p); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
